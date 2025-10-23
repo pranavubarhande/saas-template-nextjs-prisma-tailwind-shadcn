@@ -119,6 +119,16 @@ model Invoice {
   @@map("invoices")
 }
 
+model StripeEventLog {
+  id         String   @id @default(cuid())
+  type       String
+  rawId      String   @unique
+  payload    Json
+  createdAt  DateTime @default(now())
+
+  @@map("stripe_event_logs")
+}
+
 // Enums
 enum Role {
   USER
