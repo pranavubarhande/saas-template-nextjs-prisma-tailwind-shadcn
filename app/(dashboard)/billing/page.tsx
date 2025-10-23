@@ -1,7 +1,13 @@
-"use client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+'use client';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -9,14 +15,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -25,14 +31,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from '@/components/ui/select';
 import {
   CreditCard,
   Download,
@@ -45,87 +51,87 @@ import {
   Crown,
   Zap,
   Building,
-} from "lucide-react"
-import { useState } from "react"
-import { Subscription, Invoice, Plan } from "@/types"
-import { toast } from "sonner"
+} from 'lucide-react';
+import { useState } from 'react';
+import { Subscription, Invoice, Plan } from '@/types';
+import { plans, type PlanConfig } from '@/config/billing';
+import { toast } from 'sonner';
+import axiosInstance from '@/services/axiosInstance';
 
 // Mock data for demonstration - in real app, this would come from API
 const mockSubscription: Subscription = {
-  id: "sub_1",
-  userId: "user_1",
+  id: 'sub_1',
+  userId: 'user_1',
   teamId: null,
-  stripeSubscriptionId: "sub_stripe_123",
-  stripeCustomerId: "cus_stripe_456",
-  status: "ACTIVE",
-  plan: "PRO",
-  currentPeriodStart: new Date("2024-01-01"),
-  currentPeriodEnd: new Date("2024-02-01"),
+  stripeSubscriptionId: 'sub_stripe_123',
+  stripeCustomerId: 'cus_stripe_456',
+  status: 'ACTIVE',
+  plan: 'PRO',
+  currentPeriodStart: new Date('2024-01-01'),
+  currentPeriodEnd: new Date('2024-02-01'),
   cancelAtPeriodEnd: false,
-  createdAt: new Date("2024-01-01"),
-  updatedAt: new Date("2024-01-01"),
-}
+  createdAt: new Date('2024-01-01'),
+  updatedAt: new Date('2024-01-01'),
+};
 
 const mockInvoices: Invoice[] = [
   {
-    id: "inv_1",
-    userId: "user_1",
-    subscriptionId: "sub_1",
-    stripeInvoiceId: "in_stripe_123",
+    id: 'inv_1',
+    userId: 'user_1',
+    subscriptionId: 'sub_1',
+    stripeInvoiceId: 'in_stripe_123',
     amount: 2900,
-    currency: "USD",
-    status: "PAID",
+    currency: 'USD',
+    status: 'PAID',
     invoicePdf: null,
-    hostedInvoiceUrl: "https://stripe.com/invoice/123",
-    createdAt: new Date("2024-01-01"),
+    hostedInvoiceUrl: 'https://stripe.com/invoice/123',
+    createdAt: new Date('2024-01-01'),
     user: {
-      id: "user_1",
-      email: "user@example.com",
-      name: "John Doe",
-      role: "USER" as const,
+      id: 'user_1',
+      email: 'user@example.com',
+      name: 'John Doe',
+      role: 'USER' as const,
       avatar: null,
-      password: "", // Mock required field
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-01"),
+      password: '', // Mock required field
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
     },
   },
   {
-    id: "inv_2",
-    userId: "user_1",
-    subscriptionId: "sub_1",
-    stripeInvoiceId: "in_stripe_456",
+    id: 'inv_2',
+    userId: 'user_1',
+    subscriptionId: 'sub_1',
+    stripeInvoiceId: 'in_stripe_456',
     amount: 2900,
-    currency: "USD",
-    status: "PAID",
+    currency: 'USD',
+    status: 'PAID',
     invoicePdf: null,
-    hostedInvoiceUrl: "https://stripe.com/invoice/456",
-    createdAt: new Date("2023-12-01"),
+    hostedInvoiceUrl: 'https://stripe.com/invoice/456',
+    createdAt: new Date('2023-12-01'),
     user: {
-      id: "user_1",
-      email: "user@example.com",
-      name: "John Doe",
-      role: "USER" as const,
+      id: 'user_1',
+      email: 'user@example.com',
+      name: 'John Doe',
+      role: 'USER' as const,
       avatar: null,
-      password: "", // Mock required field
-      createdAt: new Date("2024-01-01"),
-      updatedAt: new Date("2024-01-01"),
+      password: '', // Mock required field
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
     },
   },
-]
+];
 
-function PlanCard({ plan, currentPlan, onSelect }: {
-  plan: Plan
-  currentPlan: Plan
-  onSelect: (plan: Plan) => void
+function PlanCard({
+  plan,
+  currentPlan,
+  onSelect,
+}: {
+  plan: Plan;
+  currentPlan: Plan;
+  onSelect: (plan: Plan) => void;
 }) {
-  const isCurrent = plan === currentPlan
-  const plans = {
-    FREE: { name: "Free", price: 0, features: ["1 Team", "Basic Support", "Limited Features"] },
-    PRO: { name: "Pro", price: 29, features: ["Unlimited Teams", "Priority Support", "Advanced Features", "API Access"] },
-    ENTERPRISE: { name: "Enterprise", price: 99, features: ["Everything in Pro", "Dedicated Support", "Custom Integrations", "SLA Guarantee"] },
-  }
-
-  const planInfo = plans[plan]
+  const isCurrent = plan === currentPlan;
+  const config = plans.find((p) => p.key === plan) as PlanConfig;
 
   return (
     <Card className={`relative ${isCurrent ? 'border-primary' : ''}`}>
@@ -136,19 +142,23 @@ function PlanCard({ plan, currentPlan, onSelect }: {
       )}
       <CardHeader>
         <div className="flex items-center gap-2">
-          {plan === 'ENTERPRISE' && <Crown className="h-5 w-5 text-yellow-500" />}
+          {plan === 'ENTERPRISE' && (
+            <Crown className="h-5 w-5 text-yellow-500" />
+          )}
           {plan === 'PRO' && <Zap className="h-5 w-5 text-blue-500" />}
           {plan === 'FREE' && <Building className="h-5 w-5 text-gray-500" />}
-          <CardTitle className="text-lg">{planInfo.name}</CardTitle>
+          <CardTitle className="text-lg">{config.name}</CardTitle>
         </div>
         <div className="text-3xl font-bold">
-          ${planInfo.price}
-          <span className="text-sm font-normal text-muted-foreground">/month</span>
+          ${config.priceMonthly}
+          <span className="text-sm font-normal text-muted-foreground">
+            /month
+          </span>
         </div>
       </CardHeader>
       <CardContent>
         <ul className="space-y-2 mb-4">
-          {planInfo.features.map((feature, index) => (
+          {config.features.map((feature, index) => (
             <li key={index} className="flex items-center gap-2 text-sm">
               <CheckCircle className="h-4 w-4 text-green-500" />
               {feature}
@@ -159,41 +169,41 @@ function PlanCard({ plan, currentPlan, onSelect }: {
           onClick={() => onSelect(plan)}
           disabled={isCurrent}
           className="w-full"
-          variant={isCurrent ? "outline" : "default"}
+          variant={isCurrent ? 'outline' : 'default'}
         >
-          {isCurrent ? "Current Plan" : `Upgrade to ${planInfo.name}`}
+          {isCurrent ? 'Current Plan' : `Choose ${config.name}`}
         </Button>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 function SubscriptionStatus({ subscription }: { subscription: Subscription }) {
   const getStatusIcon = () => {
     switch (subscription.status) {
       case 'ACTIVE':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'PAST_DUE':
-        return <XCircle className="h-4 w-4 text-red-500" />
+        return <XCircle className="h-4 w-4 text-red-500" />;
       case 'CANCELED':
-        return <XCircle className="h-4 w-4 text-gray-500" />
+        return <XCircle className="h-4 w-4 text-gray-500" />;
       default:
-        return <Clock className="h-4 w-4 text-yellow-500" />
+        return <Clock className="h-4 w-4 text-yellow-500" />;
     }
-  }
+  };
 
   const getStatusColor = () => {
     switch (subscription.status) {
       case 'ACTIVE':
-        return 'bg-green-100 text-green-800'
+        return 'bg-green-100 text-green-800';
       case 'PAST_DUE':
-        return 'bg-red-100 text-red-800'
+        return 'bg-red-100 text-red-800';
       case 'CANCELED':
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-gray-100 text-gray-800';
       default:
-        return 'bg-yellow-100 text-yellow-800'
+        return 'bg-yellow-100 text-yellow-800';
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -202,9 +212,7 @@ function SubscriptionStatus({ subscription }: { subscription: Subscription }) {
           {getStatusIcon()}
           <span className="font-medium">Current Subscription</span>
         </div>
-        <Badge className={getStatusColor()}>
-          {subscription.status}
-        </Badge>
+        <Badge className={getStatusColor()}>{subscription.status}</Badge>
       </div>
 
       <div className="grid grid-cols-2 gap-4 text-sm">
@@ -215,7 +223,9 @@ function SubscriptionStatus({ subscription }: { subscription: Subscription }) {
         <div>
           <div className="text-muted-foreground">Next Billing</div>
           <div className="font-medium">
-            {subscription.currentPeriodEnd ? new Date(subscription.currentPeriodEnd).toLocaleDateString() : 'N/A'}
+            {subscription.currentPeriodEnd
+              ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
+              : 'N/A'}
           </div>
         </div>
       </div>
@@ -223,7 +233,8 @@ function SubscriptionStatus({ subscription }: { subscription: Subscription }) {
       {subscription.cancelAtPeriodEnd && (
         <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <p className="text-sm text-yellow-800">
-            Your subscription will be canceled at the end of the current billing period.
+            Your subscription will be canceled at the end of the current billing
+            period.
           </p>
         </div>
       )}
@@ -238,17 +249,17 @@ function SubscriptionStatus({ subscription }: { subscription: Subscription }) {
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 function InvoiceActions({ invoice }: { invoice: Invoice }) {
   const handleDownload = () => {
     if (invoice.hostedInvoiceUrl) {
-      window.open(invoice.hostedInvoiceUrl, '_blank')
+      window.open(invoice.hostedInvoiceUrl, '_blank');
     } else {
-      toast.error("Invoice not available for download")
+      toast.error('Invoice not available for download');
     }
-  }
+  };
 
   return (
     <DropdownMenu>
@@ -269,22 +280,22 @@ function InvoiceActions({ invoice }: { invoice: Invoice }) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
 
 function ChangePlanDialog() {
-  const [open, setOpen] = useState(false)
-  const [selectedPlan, setSelectedPlan] = useState<Plan>("PRO")
+  const [open, setOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan>('PRO');
 
   const handlePlanChange = async () => {
     try {
       // TODO: Implement plan change logic
-      toast.success(`Plan changed to ${selectedPlan}`)
-      setOpen(false)
+      toast.success(`Plan changed to ${selectedPlan}`);
+      setOpen(false);
     } catch {
-      toast.error("Failed to change plan")
+      toast.error('Failed to change plan');
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -299,7 +310,10 @@ function ChangePlanDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          <Select value={selectedPlan} onValueChange={(value: Plan) => setSelectedPlan(value)}>
+          <Select
+            value={selectedPlan}
+            onValueChange={(value: Plan) => setSelectedPlan(value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select a plan" />
             </SelectTrigger>
@@ -311,16 +325,39 @@ function ChangePlanDialog() {
           </Select>
         </div>
         <DialogFooter>
-          <Button onClick={handlePlanChange}>
-            Change Plan
-          </Button>
+          <Button onClick={handlePlanChange}>Change Plan</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 export default function BillingPage() {
+  const handleSelectPlan = async (planKey: Plan) => {
+    try {
+      const cfg = plans.find((p) => p.key === planKey);
+      if (!cfg) return;
+      if (cfg.paymentLink) {
+        window.open(cfg.paymentLink, '_blank');
+        return;
+      }
+      if (cfg.priceId) {
+        const { data } = await axiosInstance.post('/stripe/checkout', {
+          priceId: cfg.priceId,
+          mode: 'subscription',
+        });
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          toast.error('Checkout session URL not found');
+        }
+        return;
+      }
+      toast.error('No payment method configured for this plan');
+    } catch {
+      toast.error('Unable to start checkout');
+    }
+  };
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -337,9 +374,7 @@ export default function BillingPage() {
         <Card>
           <CardHeader>
             <CardTitle>Current Subscription</CardTitle>
-            <CardDescription>
-              Your active subscription details
-            </CardDescription>
+            <CardDescription>Your active subscription details</CardDescription>
           </CardHeader>
           <CardContent>
             <SubscriptionStatus subscription={mockSubscription} />
@@ -355,21 +390,14 @@ export default function BillingPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <PlanCard
-                plan="FREE"
-                currentPlan={mockSubscription.plan}
-                onSelect={() => {}}
-              />
-              <PlanCard
-                plan="PRO"
-                currentPlan={mockSubscription.plan}
-                onSelect={() => {}}
-              />
-              <PlanCard
-                plan="ENTERPRISE"
-                currentPlan={mockSubscription.plan}
-                onSelect={() => {}}
-              />
+              {(['FREE', 'PRO', 'ENTERPRISE'] as Plan[]).map((p) => (
+                <PlanCard
+                  key={p}
+                  plan={p}
+                  currentPlan={mockSubscription.plan}
+                  onSelect={handleSelectPlan}
+                />
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -404,7 +432,9 @@ export default function BillingPage() {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <div className="font-medium">{invoice.subscription?.plan} Plan</div>
+                      <div className="font-medium">
+                        {invoice.subscription?.plan} Plan
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         {new Date(invoice.createdAt).getFullYear()}
                       </div>
@@ -412,12 +442,16 @@ export default function BillingPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-muted-foreground" />
-                      ${(invoice.amount / 100).toFixed(2)}
+                      <DollarSign className="h-4 w-4 text-muted-foreground" />$
+                      {(invoice.amount / 100).toFixed(2)}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={invoice.status === 'PAID' ? 'default' : 'secondary'}>
+                    <Badge
+                      variant={
+                        invoice.status === 'PAID' ? 'default' : 'secondary'
+                      }
+                    >
                       {invoice.status}
                     </Badge>
                   </TableCell>
@@ -431,5 +465,5 @@ export default function BillingPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -17,19 +17,27 @@ export const teamsService = {
 
   // Get specific team
   getTeam: async (teamId: string): Promise<Team> => {
-    const response = await axiosInstance.get<{ team: Team }>(`/teams/${teamId}`);
+    const response = await axiosInstance.get<{ team: Team }>(
+      `/teams/${teamId}`
+    );
     return response.data.team;
   },
 
   // Create team
   createTeam: async (teamData: CreateTeamData): Promise<Team> => {
-    const response = await axiosInstance.post<{ team: Team }>('/teams', teamData);
+    const response = await axiosInstance.post<{ team: Team }>(
+      '/teams',
+      teamData
+    );
     return response.data.team;
   },
 
   // Update team
   updateTeam: async (teamId: string, data: UpdateTeamData): Promise<Team> => {
-    const response = await axiosInstance.patch<{ team: Team }>(`/teams/${teamId}`, data);
+    const response = await axiosInstance.patch<{ team: Team }>(
+      `/teams/${teamId}`,
+      data
+    );
     return response.data.team;
   },
 
@@ -40,12 +48,17 @@ export const teamsService = {
 
   // Get team members
   getTeamMembers: async (teamId: string): Promise<TeamMember[]> => {
-    const response = await axiosInstance.get<{ members: TeamMember[] }>(`/teams/${teamId}/members`);
+    const response = await axiosInstance.get<{ members: TeamMember[] }>(
+      `/teams/${teamId}/members`
+    );
     return response.data.members;
   },
 
   // Invite member
-  inviteMember: async (teamId: string, data: InviteMemberData): Promise<void> => {
+  inviteMember: async (
+    teamId: string,
+    data: InviteMemberData
+  ): Promise<void> => {
     await axiosInstance.post(`/teams/${teamId}/members`, data);
   },
 

@@ -1,8 +1,14 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -10,7 +16,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from '@/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +24,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -27,17 +33,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from '@/components/ui/select';
 import {
   Plus,
   MoreHorizontal,
@@ -49,28 +55,35 @@ import {
   Crown,
   Shield,
   User,
-} from "lucide-react"
-import { useTeams, useCreateTeam, useDeleteTeam, useTeamMembers, useInviteMember, useUpdateTeam } from "@/hooks/useTeams"
-import { useState } from "react"
-import { Team, TeamMember, TeamRole } from "@/types"
-import { toast } from "sonner"
+} from 'lucide-react';
+import {
+  useTeams,
+  useCreateTeam,
+  useDeleteTeam,
+  useTeamMembers,
+  useInviteMember,
+  useUpdateTeam,
+} from '@/hooks/useTeams';
+import { useState } from 'react';
+import { Team, TeamMember, TeamRole } from '@/types';
+import { toast } from 'sonner';
 
 function CreateTeamDialog() {
-  const [open, setOpen] = useState(false)
-  const [formData, setFormData] = useState({ name: "", description: "" })
-  const createTeam = useCreateTeam()
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: '', description: '' });
+  const createTeam = useCreateTeam();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await createTeam.mutateAsync(formData)
-      setOpen(false)
-      setFormData({ name: "", description: "" })
-      toast.success("Team created successfully!")
+      await createTeam.mutateAsync(formData);
+      setOpen(false);
+      setFormData({ name: '', description: '' });
+      toast.success('Team created successfully!');
     } catch {
-      toast.error("Failed to create team")
+      toast.error('Failed to create team');
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -96,7 +109,9 @@ function CreateTeamDialog() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 className="col-span-3"
                 required
               />
@@ -108,7 +123,12 @@ function CreateTeamDialog() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 className="col-span-3"
                 rows={3}
               />
@@ -116,30 +136,33 @@ function CreateTeamDialog() {
           </div>
           <DialogFooter>
             <Button type="submit" disabled={createTeam.isPending}>
-              {createTeam.isPending ? "Creating..." : "Create Team"}
+              {createTeam.isPending ? 'Creating...' : 'Create Team'}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 function EditTeamDialog({ team }: { team: Team }) {
-  const [open, setOpen] = useState(false)
-  const [formData, setFormData] = useState({ name: team.name, description: team.description || "" })
-  const updateTeam = useUpdateTeam()
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: team.name,
+    description: team.description || '',
+  });
+  const updateTeam = useUpdateTeam();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await updateTeam.mutateAsync({ teamId: team.id, data: formData })
-      setOpen(false)
-      toast.success("Team updated successfully!")
+      await updateTeam.mutateAsync({ teamId: team.id, data: formData });
+      setOpen(false);
+      toast.success('Team updated successfully!');
     } catch {
-      toast.error("Failed to update team")
+      toast.error('Failed to update team');
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -152,9 +175,7 @@ function EditTeamDialog({ team }: { team: Team }) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Team</DialogTitle>
-          <DialogDescription>
-            Update your team information.
-          </DialogDescription>
+          <DialogDescription>Update your team information.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
@@ -165,7 +186,9 @@ function EditTeamDialog({ team }: { team: Team }) {
               <Input
                 id="edit-name"
                 value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
                 className="col-span-3"
                 required
               />
@@ -177,7 +200,12 @@ function EditTeamDialog({ team }: { team: Team }) {
               <Textarea
                 id="edit-description"
                 value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
                 className="col-span-3"
                 rows={3}
               />
@@ -185,31 +213,34 @@ function EditTeamDialog({ team }: { team: Team }) {
           </div>
           <DialogFooter>
             <Button type="submit" disabled={updateTeam.isPending}>
-              {updateTeam.isPending ? "Updating..." : "Update Team"}
+              {updateTeam.isPending ? 'Updating...' : 'Update Team'}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 function InviteMemberDialog({ team }: { team: Team }) {
-  const [open, setOpen] = useState(false)
-  const [formData, setFormData] = useState({ email: "", role: "MEMBER" as TeamRole })
-  const inviteMember = useInviteMember()
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    role: 'MEMBER' as TeamRole,
+  });
+  const inviteMember = useInviteMember();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      await inviteMember.mutateAsync({ teamId: team.id, data: formData })
-      setOpen(false)
-      setFormData({ email: "", role: "MEMBER" })
-      toast.success("Invitation sent successfully!")
+      await inviteMember.mutateAsync({ teamId: team.id, data: formData });
+      setOpen(false);
+      setFormData({ email: '', role: 'MEMBER' });
+      toast.success('Invitation sent successfully!');
     } catch {
-      toast.error("Failed to send invitation")
+      toast.error('Failed to send invitation');
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -236,7 +267,9 @@ function InviteMemberDialog({ team }: { team: Team }) {
                 id="invite-email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, email: e.target.value }))
+                }
                 className="col-span-3"
                 placeholder="user@example.com"
                 required
@@ -246,7 +279,12 @@ function InviteMemberDialog({ team }: { team: Team }) {
               <Label htmlFor="invite-role" className="text-right">
                 Role
               </Label>
-              <Select value={formData.role} onValueChange={(value: TeamRole) => setFormData(prev => ({ ...prev, role: value }))}>
+              <Select
+                value={formData.role}
+                onValueChange={(value: TeamRole) =>
+                  setFormData((prev) => ({ ...prev, role: value }))
+                }
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
@@ -259,28 +297,28 @@ function InviteMemberDialog({ team }: { team: Team }) {
           </div>
           <DialogFooter>
             <Button type="submit" disabled={inviteMember.isPending}>
-              {inviteMember.isPending ? "Sending..." : "Send Invitation"}
+              {inviteMember.isPending ? 'Sending...' : 'Send Invitation'}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 function TeamActions({ team }: { team: Team }) {
-  const deleteTeam = useDeleteTeam()
+  const deleteTeam = useDeleteTeam();
 
   const handleDelete = async () => {
     if (confirm(`Are you sure you want to delete ${team.name}?`)) {
       try {
-        await deleteTeam.mutateAsync(team.id)
-        toast.success("Team deleted successfully!")
+        await deleteTeam.mutateAsync(team.id);
+        toast.success('Team deleted successfully!');
       } catch {
-        toast.error("Failed to delete team")
+        toast.error('Failed to delete team');
       }
     }
-  }
+  };
 
   return (
     <DropdownMenu>
@@ -300,34 +338,34 @@ function TeamActions({ team }: { team: Team }) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
 
 function TeamMembersDialog({ team }: { team: Team }) {
-  const [open, setOpen] = useState(false)
-  const { data: members, isLoading } = useTeamMembers(team.id)
+  const [open, setOpen] = useState(false);
+  const { data: members, isLoading } = useTeamMembers(team.id);
 
   const getRoleIcon = (role: TeamRole) => {
     switch (role) {
       case 'OWNER':
-        return <Crown className="h-4 w-4" />
+        return <Crown className="h-4 w-4" />;
       case 'ADMIN':
-        return <Shield className="h-4 w-4" />
+        return <Shield className="h-4 w-4" />;
       default:
-        return <User className="h-4 w-4" />
+        return <User className="h-4 w-4" />;
     }
-  }
+  };
 
   const getRoleBadgeVariant = (role: TeamRole) => {
     switch (role) {
       case 'OWNER':
-        return 'default'
+        return 'default';
       case 'ADMIN':
-        return 'secondary'
+        return 'secondary';
       default:
-        return 'outline'
+        return 'outline';
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -364,6 +402,7 @@ function TeamMembersDialog({ team }: { team: Team }) {
                     <TableCell className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
                         {member.user.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={member.user.avatar}
                             alt={member.user.name || member.user.email}
@@ -371,17 +410,26 @@ function TeamMembersDialog({ team }: { team: Team }) {
                           />
                         ) : (
                           <span className="text-sm font-medium">
-                            {(member.user.name || member.user.email).charAt(0).toUpperCase()}
+                            {(member.user.name || member.user.email)
+                              .charAt(0)
+                              .toUpperCase()}
                           </span>
                         )}
                       </div>
                       <div>
-                        <div className="font-medium">{member.user.name || 'Unknown'}</div>
-                        <div className="text-sm text-muted-foreground">{member.user.email}</div>
+                        <div className="font-medium">
+                          {member.user.name || 'Unknown'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {member.user.email}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getRoleBadgeVariant(member.role)} className="flex items-center gap-1 w-fit">
+                      <Badge
+                        variant={getRoleBadgeVariant(member.role)}
+                        className="flex items-center gap-1 w-fit"
+                      >
                         {getRoleIcon(member.role)}
                         {member.role}
                       </Badge>
@@ -399,18 +447,18 @@ function TeamMembersDialog({ team }: { team: Team }) {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 export default function TeamsPage() {
-  const { data: teams, isLoading } = useTeams()
+  const { data: teams, isLoading } = useTeams();
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="text-muted-foreground">Loading teams...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -471,5 +519,5 @@ export default function TeamsPage() {
         </Card>
       )}
     </div>
-  )
+  );
 }
