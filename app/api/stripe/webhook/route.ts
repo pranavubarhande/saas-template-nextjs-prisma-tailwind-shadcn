@@ -4,12 +4,6 @@ import type Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { logStripeEvent } from '@/lib/logger';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export async function POST(request: NextRequest) {
   try {
     if (!stripe) {
