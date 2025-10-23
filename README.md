@@ -335,13 +335,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you need help or have questions:
 
-1. Check the [Issues](https://github.com/your-username/saas-template-nextjs-prisma-tailwind-shadcn/issues) page
+1. Check the [Issues](https://github.com/pranavubarhande/saas-template-nextjs-prisma-tailwind-shadcn/issues) page
 2. Create a new issue with detailed information
 3. Join our Discord community (if available)
-
-## 🔄 Updates
-
-This template is actively maintained. Check the [Changelog](CHANGELOG.md) for updates and new features.
 
 ---
 
