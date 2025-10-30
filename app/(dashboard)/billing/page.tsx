@@ -53,10 +53,10 @@ import {
   Building,
 } from 'lucide-react';
 import { useState } from 'react';
-import { Subscription, Invoice, Plan } from '@/types';
+import { Subscription, Invoice, Plan } from '@/types/subscription.types';
 import { plans, type PlanConfig } from '@/config/billing';
 import { toast } from 'sonner';
-import axiosInstance from '@/services/axiosInstance';
+import axiosInstance from '@/services/axiosInstance.service';
 
 // Mock data for demonstration - in real app, this would come from API
 const mockSubscription: Subscription = {
