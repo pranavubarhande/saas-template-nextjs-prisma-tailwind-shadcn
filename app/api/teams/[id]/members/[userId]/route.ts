@@ -1,19 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authMiddleware } from '@/middlewares/auth.middleware';
+import { withAuth } from '@/middlewares/auth.middleware';
 import { prisma } from '@/lib/prisma';
 
-export async function DELETE(
+export const DELETE = withAuth(async (
   request: NextRequest,
+  user,
   { params }: { params: Promise<{ id: string; userId: string }> }
-) {
+) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const { id: teamId, userId: memberUserId } = await params;
 
     // Check if user is owner or admin of the team
@@ -77,10 +71,10 @@ export async function DELETE(
       message: 'Member removed successfully',
     });
   } catch (error) {
-    console.error('Remove member error:', error);
+    console.error('Error removing team member:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
     );
   }
-}
+});

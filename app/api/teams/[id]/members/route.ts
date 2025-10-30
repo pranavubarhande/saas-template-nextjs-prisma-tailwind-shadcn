@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authMiddleware } from '@/middlewares/auth.middleware';
+import { withAuth } from '@/middlewares/auth.middleware';
 import { prisma } from '@/lib/prisma';
 import { generateRandomToken } from '@/utils/common.utils';
 import { addHours } from 'date-fns';
@@ -10,18 +10,12 @@ const inviteMemberSchema = z.object({
   role: z.enum(['ADMIN', 'MEMBER']).default('MEMBER'),
 });
 
-export async function GET(
+export const GET = withAuth(async (
   request: NextRequest,
+  user,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const { id: teamId } = await params;
 
     // Check if user has access to the team
@@ -56,26 +50,20 @@ export async function GET(
       members,
     });
   } catch (error) {
-    console.error('Get team members error:', error);
+    console.error('Error fetching team members:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch team members' },
       { status: 500 }
     );
   }
-}
+});
 
-export async function POST(
+export const POST = withAuth(async (
   request: NextRequest,
+  user,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const { id: teamId } = await params;
     const body = await request.json();
     const { email, role } = inviteMemberSchema.parse(body);
@@ -169,9 +157,7 @@ export async function POST(
 
       // TODO: Send invite email here
 
-      return NextResponse.json({
-        message: 'Invite sent successfully',
-      });
+      return NextResponse.json({ message: 'Invitation sent successfully' });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -187,4 +173,4 @@ export async function POST(
       { status: 500 }
     );
   }
-}
+});

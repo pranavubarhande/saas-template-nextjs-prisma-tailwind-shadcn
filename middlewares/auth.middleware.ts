@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserFromToken } from '@/lib/auth';
+import { User } from '@/types/user.types';
 
-export async function authMiddleware(request: NextRequest) {
+export const authMiddleware = async (request: NextRequest) => {
   try {
     const authHeader = request.headers.get('authorization');
 
@@ -32,16 +33,21 @@ export async function authMiddleware(request: NextRequest) {
   }
 }
 
-export function withAuth(
-  handler: (request: NextRequest, user: unknown) => Promise<NextResponse>
-) {
-  return async (request: NextRequest) => {
+export const withAuth = <T extends unknown[]>(
+  handler: (
+    request: NextRequest,
+    user: User,
+    ...args: T
+  ) => Promise<NextResponse>
+) => {
+  return async (request: NextRequest, ...args: T) => {
     const authResult = await authMiddleware(request);
 
     if (authResult instanceof NextResponse) {
       return authResult;
     }
 
-    return handler(request, authResult.user);
+    return handler(request, authResult.user, ...args);
   };
-}
+};
+

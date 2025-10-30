@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authMiddleware } from '@/middlewares/auth.middleware';
+import { withAuth } from '@/middlewares/auth.middleware';
 import { prisma } from '@/lib/prisma';
 import { slugify } from '@/utils/common.utils';
 
@@ -9,16 +9,8 @@ const createTeamSchema = z.object({
   description: z.string().optional(),
 });
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, user) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
-
     // Get teams where user is owner or member
     const teams = await prisma.team.findMany({
       where: {
@@ -64,23 +56,16 @@ export async function GET(request: NextRequest) {
       teams,
     });
   } catch (error) {
-    console.error('Get teams error:', error);
+    console.error('Error fetching teams:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch teams' },
       { status: 500 }
     );
   }
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: NextRequest, user) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const body = await request.json();
     const { name, description } = createTeamSchema.parse(body);
 
@@ -164,4 +149,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

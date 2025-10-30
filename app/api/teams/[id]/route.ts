@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authMiddleware } from '@/middlewares/auth.middleware';
+import { withAuth } from '@/middlewares/auth.middleware';
 import { prisma } from '@/lib/prisma';
 import { slugify } from '@/utils/common.utils';
 
@@ -9,18 +9,12 @@ const updateTeamSchema = z.object({
   description: z.string().optional(),
 });
 
-export async function GET(
+export const GET = withAuth(async (
   request: NextRequest,
+  user,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const { id: teamId } = await params;
 
     // Check if team exists and user has access
@@ -76,26 +70,20 @@ export async function GET(
       team,
     });
   } catch (error) {
-    console.error('Get team error:', error);
+    console.error('Error fetching team:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to fetch team' },
       { status: 500 }
     );
   }
-}
+});
 
-export async function PATCH(
+export const PATCH = withAuth(async (
   request: NextRequest,
+  user,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const { id: teamId } = await params;
     const body = await request.json();
     const updateData = updateTeamSchema.parse(body);
@@ -172,20 +160,14 @@ export async function PATCH(
       { status: 500 }
     );
   }
-}
+});
 
-export async function DELETE(
+export const DELETE = withAuth(async (
   request: NextRequest,
+  user,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const { id: teamId } = await params;
 
     // Check if user is owner of the team
@@ -218,4 +200,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
+});

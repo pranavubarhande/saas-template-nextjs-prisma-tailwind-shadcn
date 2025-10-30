@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authMiddleware } from '@/middlewares/auth.middleware';
+import { withAuth } from '@/middlewares/auth.middleware';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/auth';
 
@@ -14,40 +14,12 @@ const updatePasswordSchema = z.object({
   newPassword: z.string().min(8),
 });
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: NextRequest, user) => {
+  return NextResponse.json(user);
+});
+
+export const PATCH = withAuth(async (request: NextRequest, user) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
-
-    // Return user data without password
-    const { password, ...userWithoutPassword } = user;
-
-    return NextResponse.json({
-      user: userWithoutPassword,
-    });
-  } catch (error) {
-    console.error('Get user settings error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PATCH(request: NextRequest) {
-  try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const body = await request.json();
 
     // Update profile
@@ -72,12 +44,19 @@ export async function PATCH(request: NextRequest) {
       const updatedUser = await prisma.user.update({
         where: { id: user.id },
         data: updateData,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          avatar: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       });
 
-      const { password, ...userWithoutPassword } = updatedUser;
-
       return NextResponse.json({
-        user: userWithoutPassword,
+        user: updatedUser,
         message: 'Profile updated successfully',
       });
     }
@@ -100,17 +79,10 @@ export async function PATCH(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function PUT(request: NextRequest) {
+export const PUT = withAuth(async (request: NextRequest, user) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
     const body = await request.json();
     const { currentPassword, newPassword } = updatePasswordSchema.parse(body);
 
@@ -152,18 +124,10 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
-export async function DELETE(request: NextRequest) {
+export const DELETE = withAuth(async (request: NextRequest, user) => {
   try {
-    const authResult = await authMiddleware(request);
-
-    if (authResult instanceof NextResponse) {
-      return authResult;
-    }
-
-    const { user } = authResult;
-
     // Delete user (this will cascade delete related records)
     await prisma.user.delete({
       where: { id: user.id },
@@ -182,4 +146,4 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
