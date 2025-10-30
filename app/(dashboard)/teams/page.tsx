@@ -60,10 +60,12 @@ import {
   useTeams,
   useCreateTeam,
   useDeleteTeam,
-  useTeamMembers,
   useInviteMember,
   useUpdateTeam,
+  useTeamMembers,
+  useTeamInvites,
 } from '@/hooks/useTeams';
+import { Mail, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { Team, TeamMember, TeamRole } from '@/types/team.types';
 import { toast } from 'sonner';
@@ -343,7 +345,8 @@ function TeamActions({ team }: { team: Team }) {
 
 function TeamMembersDialog({ team }: { team: Team }) {
   const [open, setOpen] = useState(false);
-  const { data: members, isLoading } = useTeamMembers(team.id);
+  const { data: members, isLoading: isLoadingMembers } = useTeamMembers(team.id);
+  const { data: invites, isLoading: isLoadingInvites } = useTeamInvites(team.id);
 
   const getRoleIcon = (role: TeamRole) => {
     switch (role) {
@@ -375,75 +378,136 @@ function TeamMembersDialog({ team }: { team: Team }) {
           Members ({team._count?.members || 0})
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Team Members - {team.name}</DialogTitle>
           <DialogDescription>
             Manage team members and their roles.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-muted-foreground">Loading members...</div>
+        <div className="py-4 w-full overflow-scroll">
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-lg font-medium mb-4">Team Members</h3>
+              {isLoadingMembers ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-muted-foreground">Loading members...</div>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Member</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Joined</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {members?.map((member: TeamMember) => (
+                      <TableRow key={member.id}>
+                        <TableCell className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                            {member.user.avatar ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={member.user.avatar}
+                                alt={member.user.name || member.user.email}
+                                className="h-8 w-8 rounded-full"
+                              />
+                            ) : (
+                              <span className="text-sm font-medium">
+                                {(member.user.name || member.user.email)
+                                  .charAt(0)
+                                  .toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-medium">
+                              {member.user.name || 'Unknown'}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {member.user.email}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={getRoleBadgeVariant(member.role)}
+                            className="flex items-center gap-1 w-fit"
+                          >
+                            {getRoleIcon(member.role)}
+                            {member.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-muted-foreground">
+                            {new Date(member.joinedAt).toLocaleDateString()}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Member</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Joined</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {members?.map((member: TeamMember) => (
-                  <TableRow key={member.id}>
-                    <TableCell className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                        {member.user.avatar ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={member.user.avatar}
-                            alt={member.user.name || member.user.email}
-                            className="h-8 w-8 rounded-full"
-                          />
-                        ) : (
-                          <span className="text-sm font-medium">
-                            {(member.user.name || member.user.email)
-                              .charAt(0)
-                              .toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-medium">
-                          {member.user.name || 'Unknown'}
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          {member.user.email}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={getRoleBadgeVariant(member.role)}
-                        className="flex items-center gap-1 w-fit"
-                      >
-                        {getRoleIcon(member.role)}
-                        {member.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(member.joinedAt).toLocaleDateString()}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+
+            <div>
+              <h3 className="text-lg font-medium mb-4">Pending Invitations</h3>
+              {isLoadingInvites ? (
+                <div className="flex items-center justify-center py-4">
+                  <div className="text-muted-foreground">Loading invites...</div>
+                </div>
+              ) : invites?.length === 0 ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  No pending invitations
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Invited On</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {invites?.map((invite) => (
+                      <TableRow key={invite.id}>
+                        <TableCell className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                            <Mail className="h-4 w-4" />
+                          </div>
+                          <div className="font-medium">{invite.email}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={getRoleBadgeVariant(invite.role as TeamRole)}
+                            className="flex items-center gap-1 w-fit"
+                          >
+                            {getRoleIcon(invite.role as TeamRole)}
+                            {invite.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-sm text-muted-foreground">
+                            {new Date(invite.createdAt).toLocaleDateString()}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="gap-1">
+                            <Clock className="h-3 w-3" />
+                            Pending
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

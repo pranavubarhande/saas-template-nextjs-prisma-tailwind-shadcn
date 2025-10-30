@@ -5,6 +5,7 @@ import {
   UpdateTeamData,
   TeamMember,
   InviteMemberData,
+  TeamInvite,
 } from '@/types/team.types';
 
 export const teamsService = {
@@ -45,6 +46,11 @@ export const teamsService = {
       `/teams/${teamId}/members`
     );
     return response.data.members;
+  },
+
+  getTeamInvites: async (teamId: string): Promise<TeamInvite[]> => {
+    const response = await axiosInstance.get<TeamInvite[]>(`/teams/${teamId}/invites`);
+    return response.data;
   },
 
   inviteMember: async (
