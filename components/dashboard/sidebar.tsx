@@ -21,6 +21,7 @@ import {
   Settings as SettingsIcon,
 } from 'lucide-react';
 import { NavUser } from './nav-user';
+import Image from 'next/image';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -51,6 +52,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
+        {/* App Logo and Name */}
+        
+        <div className="flex items-center gap-1 px-3 pt-4 group/header">
+          <div className="flex items-center justify-center w-6 h-6 shrink-0">
+            <Image
+              src="/globe.svg"
+              alt="App Logo"
+              width={16}
+              height={16}
+              className="dark:invert"
+              priority
+            />
+          </div>
+          <span className="font-semibold text-sm whitespace-nowrap transition-all duration-300 opacity-100 group-data-[collapsible=icon]/sidebar:opacity-0 group-data-[collapsible=icon]/sidebar:invisible group-data-[collapsible=icon]/sidebar:w-0 group-data-[collapsible=icon]/sidebar:overflow-hidden">
+            SaaA Template
+          </span>
+        </div>
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
