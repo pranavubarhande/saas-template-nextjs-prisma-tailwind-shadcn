@@ -32,6 +32,7 @@ export interface TeamInvite {
   teamId: string;
   invitedBy: string;
   expiresAt: Date;
+  accepted: boolean;
   createdAt: Date;
   team: Team;
 }

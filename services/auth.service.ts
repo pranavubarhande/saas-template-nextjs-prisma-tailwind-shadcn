@@ -1,3 +1,4 @@
+import { TeamInvite } from '@/types/team.types';
 import axiosInstance from './axiosInstance.service';
 import {
   AuthResponse,
@@ -23,12 +24,12 @@ export const authService = {
     return response.data;
   },
 
-  getCurrentUser: async (): Promise<AuthUser> => {
-    const response = await axiosInstance.get<{ user: AuthUser }>('/auth/me');
+  getCurrentUser: async (): Promise<{ user: AuthUser, pendingInvites: TeamInvite[] }> => {
+    const response = await axiosInstance.get<{ user: AuthUser, pendingInvites: TeamInvite[] }>('/users/me');
     if (!response.data.user) {
       throw new Error('Failed to get user');
     }
-    return response.data.user;
+    return response.data;
   },
 
   logout: async (): Promise<void> => {

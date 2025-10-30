@@ -70,6 +70,7 @@ model TeamInvite {
   teamId    String
   invitedBy String
   expiresAt DateTime
+  accepted  Boolean  @default(false)
   createdAt DateTime @default(now())
 
   // Relations

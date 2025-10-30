@@ -64,11 +64,13 @@ import {
   useUpdateTeam,
   useTeamMembers,
   useTeamInvites,
+  useAcceptInvite,
 } from '@/hooks/useTeams';
-import { Mail, Clock } from 'lucide-react';
+import { Mail, Clock, Check } from 'lucide-react';
 import { useState } from 'react';
-import { Team, TeamMember, TeamRole } from '@/types/team.types';
+import { Team, TeamMember, TeamRole, TeamInvite } from '@/types/team.types';
 import { toast } from 'sonner';
+import { useCurrentUser } from '@/hooks/useAuth';
 
 function CreateTeamDialog() {
   const [open, setOpen] = useState(false);
@@ -497,8 +499,8 @@ function TeamMembersDialog({ team }: { team: Team }) {
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className="gap-1">
-                            <Clock className="h-3 w-3" />
-                            Pending
+                            {invite.accepted ? <Check className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+                            {invite.accepted ? 'Accepted' : 'Pending'}
                           </Badge>
                         </TableCell>
                       </TableRow>
@@ -511,6 +513,106 @@ function TeamMembersDialog({ team }: { team: Team }) {
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function PendingInvitesSection() {
+  const { data: userData } = useCurrentUser();
+  const acceptInvite = useAcceptInvite();
+
+  const handleAcceptInvite = async (teamId: string, inviteId: string) => {
+    try {
+      await acceptInvite.mutateAsync({ teamId, inviteId });
+      toast.success('Invite accepted successfully!');
+    } catch {
+      toast.error('Failed to accept invite');
+    }
+  };
+
+  if (!userData?.pendingInvites || userData.pendingInvites.length === 0) {
+    return null;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Mail className="h-5 w-5" />
+          Pending Team Invites
+        </CardTitle>
+        <CardDescription>
+          You have been invited to join these teams.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {userData.pendingInvites.map((invite: TeamInvite) => (
+            <div
+              key={invite.id}
+              className="flex items-center justify-between p-4 border rounded-lg"
+            >
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="font-medium">{invite.team.name}</div>
+                  <div className="text-sm text-muted-foreground">
+                    Invited as {invite.role.toLowerCase()}
+                  </div>
+                </div>
+              </div>
+              <Button
+                onClick={() => handleAcceptInvite(invite.teamId, invite.id)}
+                disabled={acceptInvite.isPending}
+                size="sm"
+              >
+                <Check className="mr-2 h-4 w-4" />
+                {acceptInvite.isPending ? 'Accepting...' : 'Accept'}
+              </Button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function TeamCard({ team }: { team: Team }) {
+  const { data: userData } = useCurrentUser();
+
+  // Find the current user's membership in this team
+  const userMembership = team.members.find(member => member.userId === userData?.user?.id);
+  const isAdminOrOwner = userMembership?.role === 'ADMIN' || userMembership?.role === 'OWNER' || team.ownerId === userData?.user?.id;
+
+  return (
+    <Card className="relative">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg">{team.name}</CardTitle>
+          {isAdminOrOwner && <TeamActions team={team} />}
+        </div>
+        {team.description && (
+          <CardDescription>{team.description}</CardDescription>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            {team._count?.members || 0} members
+          </div>
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            {new Date(team.createdAt).toLocaleDateString()}
+          </div>
+        </div>
+        <div className="mt-4 flex gap-2">
+          <TeamMembersDialog team={team} />
+          {isAdminOrOwner && <InviteMemberDialog team={team} />}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -537,36 +639,12 @@ export default function TeamsPage() {
         <CreateTeamDialog />
       </div>
 
+      <PendingInvitesSection />
+
       {teams && teams.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {teams.map((team) => (
-            <Card key={team.id} className="relative">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">{team.name}</CardTitle>
-                  <TeamActions team={team} />
-                </div>
-                {team.description && (
-                  <CardDescription>{team.description}</CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    {team._count?.members || 0} members
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    {new Date(team.createdAt).toLocaleDateString()}
-                  </div>
-                </div>
-                <div className="mt-4 flex gap-2">
-                  <TeamMembersDialog team={team} />
-                  <InviteMemberDialog team={team} />
-                </div>
-              </CardContent>
-            </Card>
+            <TeamCard key={team.id} team={team} />
           ))}
         </div>
       ) : (

@@ -1,3 +1,5 @@
+import { Team, TeamMember, TeamInvite } from './team.types';
+
 export interface User {
   id: string;
   email: string;
@@ -7,6 +9,9 @@ export interface User {
   avatar: string | null;
   createdAt: Date;
   updatedAt: Date;
+  teamMemberships?: TeamMember[];
+  ownedTeams?: Team[];
+  pendingInvites?: TeamInvite[];
 }
 
 export type Role = 'USER' | 'ADMIN' | 'SUPER_ADMIN';
@@ -28,6 +33,7 @@ export interface AuthUser {
   name: string | null;
   role: Role;
   avatar: string | null;
+  pendingInvites?: TeamInvite[];
 }
 
 export interface AuthResponse {

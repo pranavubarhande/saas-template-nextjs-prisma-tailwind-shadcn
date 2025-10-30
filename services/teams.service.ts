@@ -63,4 +63,8 @@ export const teamsService = {
   removeMember: async (teamId: string, userId: string): Promise<void> => {
     await axiosInstance.delete(`/teams/${teamId}/members/${userId}`);
   },
+
+  acceptInvite: async (teamId: string, inviteId: string): Promise<void> => {
+    await axiosInstance.post(`/teams/${teamId}/invites/${inviteId}`);
+  },
 };

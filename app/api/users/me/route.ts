@@ -15,7 +15,60 @@ const updatePasswordSchema = z.object({
 });
 
 export const GET = withAuth(async (request: NextRequest, user) => {
-  return NextResponse.json(user);
+  try {
+    const userWithInvites = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: {
+        teamMemberships: {
+          include: {
+            team: true,
+          },
+        },
+        ownedTeams: {
+          include: {
+            members: {
+              include: {
+                user: true,
+              },
+            },
+            _count: {
+              select: {
+                members: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Get pending invites for this user
+    const pendingInvites = await prisma.teamInvite.findMany({
+      where: {
+        email: user.email,
+        accepted: false,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+      include: {
+        team: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return NextResponse.json({
+      user: userWithInvites,
+      pendingInvites,
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch user data' },
+      { status: 500 }
+    );
+  }
 });
 
 export const PATCH = withAuth(async (request: NextRequest, user) => {

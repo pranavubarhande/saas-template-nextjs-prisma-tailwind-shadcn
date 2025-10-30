@@ -37,7 +37,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return null;
   });
 
-  const { data: user, isLoading, error } = useCurrentUser();
+  const { data: userData, isLoading, error } = useCurrentUser();
   const loginMutation = useLogin();
   const registerMutation = useRegister();
   const logoutMutation = useLogout();
@@ -71,10 +71,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const value: AuthContextType = {
-    user: user || null,
+    user: userData?.user || null,
     isLoading:
       isLoading || loginMutation.isPending || registerMutation.isPending,
-    isAuthenticated: !!user && !error,
+    isAuthenticated: !!userData?.user && !error,
     login,
     register,
     logout,

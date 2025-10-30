@@ -85,6 +85,8 @@ export const useInviteMember = () => {
     }) => teamsService.inviteMember(teamId, data),
     onSuccess: (_, { teamId }) => {
       queryClient.invalidateQueries({ queryKey: ['team-members', teamId] });
+      queryClient.invalidateQueries({ queryKey: ['team-invites', teamId] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
   });
 };
@@ -97,6 +99,19 @@ export const useRemoveMember = () => {
       teamsService.removeMember(teamId, userId),
     onSuccess: (_, { teamId }) => {
       queryClient.invalidateQueries({ queryKey: ['team-members', teamId] });
+    },
+  });
+};
+
+export const useAcceptInvite = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ teamId, inviteId }: { teamId: string; inviteId: string }) =>
+      teamsService.acceptInvite(teamId, inviteId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] });
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
   });
 };
