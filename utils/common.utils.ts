@@ -1,4 +1,3 @@
-
 export const slugify = (text: string): string => {
   return text
     .toLowerCase()
@@ -6,7 +5,7 @@ export const slugify = (text: string): string => {
     .replace(/\s+/g, '-') // Replace spaces with hyphens
     .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
     .trim();
-}
+};
 
 export const generateRandomToken = (length: number = 32): string => {
   const chars =
@@ -16,4 +15,4 @@ export const generateRandomToken = (length: number = 32): string => {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return result;
-}
+};

@@ -1,4 +1,4 @@
-import { Plan } from '@/types';
+import { Plan } from '@/types/subscription.types';
 
 export type PlanConfig = {
   key: Plan;

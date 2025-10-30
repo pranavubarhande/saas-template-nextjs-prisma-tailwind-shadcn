@@ -34,5 +34,3 @@ export interface AuthResponse {
   user: AuthUser;
   token: string;
 }
-
-

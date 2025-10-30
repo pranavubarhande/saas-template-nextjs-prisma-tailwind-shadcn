@@ -1,5 +1,5 @@
-import { Team } from "@/types/team.types";
-import { User } from "@/types/user.types";
+import { Team } from '@/types/team.types';
+import { User } from '@/types/user.types';
 
 export interface Subscription {
   id: string;
@@ -41,7 +41,6 @@ export interface CreateSubscriptionData {
 export interface UpdateSubscriptionData {
   cancelAtPeriodEnd?: boolean;
 }
-
 
 export type SubscriptionStatus =
   | 'INACTIVE'
