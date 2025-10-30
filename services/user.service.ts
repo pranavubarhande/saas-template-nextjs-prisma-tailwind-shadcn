@@ -1,9 +1,7 @@
-import axiosInstance from './axiosInstance';
-import { AuthUser } from '@/types';
+import axiosInstance from './axiosInstance.service';
+import { AuthUser } from '@/types/user.types';
 
-// User settings API calls
 export const userService = {
-  // Get user settings
   getUserSettings: async (): Promise<AuthUser> => {
     const response = await axiosInstance.get<{ user: AuthUser }>('/users/me');
     if (!response.data.user) {
@@ -12,7 +10,6 @@ export const userService = {
     return response.data.user;
   },
 
-  // Update profile
   updateProfile: async (data: {
     name?: string;
     email?: string;
@@ -27,7 +24,6 @@ export const userService = {
     return response.data.user;
   },
 
-  // Update password
   updatePassword: async (data: {
     currentPassword: string;
     newPassword: string;
@@ -35,7 +31,6 @@ export const userService = {
     await axiosInstance.put('/users/me', data);
   },
 
-  // Delete account
   deleteAccount: async (): Promise<void> => {
     await axiosInstance.delete('/users/me');
   },
