@@ -22,10 +22,11 @@ import {
 } from 'lucide-react';
 import { NavUser } from './nav-user';
 import Image from 'next/image';
+import { useSidebar } from '@/components/ui/sidebar';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
-
+  const { open } = useSidebar();
   const mainItems = [
     {
       label: 'Dashboard',
@@ -65,9 +66,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               priority
             />
           </div>
-          <span className="font-semibold text-sm whitespace-nowrap transition-all duration-300 opacity-100 group-data-[collapsible=icon]/sidebar:opacity-0 group-data-[collapsible=icon]/sidebar:invisible group-data-[collapsible=icon]/sidebar:w-0 group-data-[collapsible=icon]/sidebar:overflow-hidden">
-            SaaA Template
-          </span>
+          {open && (
+            <span className="font-semibold text-sm whitespace-nowrap transition-all duration-300 opacity-100 group-data-[collapsible=icon]/sidebar:opacity-0 group-data-[collapsible=icon]/sidebar:invisible group-data-[collapsible=icon]/sidebar:w-0 group-data-[collapsible=icon]/sidebar:overflow-hidden">
+              SaaA Template
+            </span>
+          )}
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
