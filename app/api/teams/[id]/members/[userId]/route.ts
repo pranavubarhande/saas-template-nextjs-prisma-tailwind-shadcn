@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authMiddleware } from '@/lib/middleware';
+import { authMiddleware } from '@/middlewares/auth.middleware';
 import { prisma } from '@/lib/prisma';
 
 export async function DELETE(

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe, getStripeWebhookSecret } from '@/lib/stripe';
 import type Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
-import { logStripeEvent } from '@/lib/logger';
+import { logStripeEvent } from '@/lib/stripeLogger';
 
 export async function POST(request: NextRequest) {
   try {

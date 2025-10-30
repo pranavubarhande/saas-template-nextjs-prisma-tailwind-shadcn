@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authMiddleware } from '@/lib/middleware';
+import { authMiddleware } from '@/middlewares/auth.middleware';
 import { prisma } from '@/lib/prisma';
-import { generateRandomToken } from '@/lib/utils';
+import { generateRandomToken } from '@/utils/common.utils';
 import { addHours } from 'date-fns';
 
 const inviteMemberSchema = z.object({

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { authMiddleware } from '@/lib/middleware';
+import { authMiddleware } from '@/middlewares/auth.middleware';
 
 export async function POST(request: NextRequest) {
   try {

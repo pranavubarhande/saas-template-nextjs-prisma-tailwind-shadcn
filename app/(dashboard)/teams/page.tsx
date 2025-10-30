@@ -65,7 +65,7 @@ import {
   useUpdateTeam,
 } from '@/hooks/useTeams';
 import { useState } from 'react';
-import { Team, TeamMember, TeamRole } from '@/types';
+import { Team, TeamMember, TeamRole } from '@/types/team.types';
 import { toast } from 'sonner';
 
 function CreateTeamDialog() {

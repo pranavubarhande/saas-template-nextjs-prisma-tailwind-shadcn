@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ROUTES } from '@/lib/routes';
+import { ROUTES } from '@/constants/routes';
 import {
   Sidebar,
   SidebarContent,

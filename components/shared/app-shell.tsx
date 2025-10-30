@@ -2,17 +2,17 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { PUBLIC_ROUTES, AUTH_ROUTES } from '@/lib/routes';
+import { PUBLIC_ROUTES, AUTH_ROUTES } from '@/constants/routes';
 import { AppSidebar } from '@/components/dashboard/sidebar';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardHeader } from '@/components/dashboard/header';
 
-function titleFromPath(pathname: string) {
+const titleFromPath = (pathname: string) => {
   const parts = pathname.split('/').filter(Boolean);
   if (parts.length === 0) return 'Home';
   const first = parts[0];
   return first.charAt(0).toUpperCase() + first.slice(1);
-}
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

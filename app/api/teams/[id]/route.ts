@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authMiddleware } from '@/lib/middleware';
+import { authMiddleware } from '@/middlewares/auth.middleware';
 import { prisma } from '@/lib/prisma';
-import { slugify } from '@/lib/utils';
+import { slugify } from '@/utils/common.utils';
 
 const updateTeamSchema = z.object({
   name: z.string().min(1).max(50).optional(),

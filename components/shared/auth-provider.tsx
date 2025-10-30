@@ -7,7 +7,11 @@ import {
   useRegister,
   useLogout,
 } from '@/hooks/useAuth';
-import { AuthUser, LoginCredentials, RegisterCredentials } from '@/types';
+import {
+  AuthUser,
+  LoginCredentials,
+  RegisterCredentials,
+} from '@/types/user.types';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -27,7 +31,6 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(() => {
-    // Initialize token state directly from localStorage to avoid synchronous setState in useEffect
     if (typeof window !== 'undefined') {
       return localStorage.getItem('token');
     }

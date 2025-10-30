@@ -171,25 +171,25 @@ Before you begin, ensure you have the following installed:
 ## 📁 Project Structure
 
 ```markdown
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication pages
-│   ├── (dashboard)/       # Protected dashboard pages
-│   ├── api/               # API routes
-│   └── globals.css        # Global styles
-├── components/            # React components
-│   ├── ui/               # shadcn/ui components
-│   ├── auth/             # Authentication components
-│   ├── dashboard/        # Dashboard components
-│   └── shared/           # Shared components
-├── hooks/                # Custom React hooks
-├── lib/                  # Utility libraries
-│   ├── middleware.ts     # Next.js middleware
-│   ├── prisma.ts         # Prisma client
-│   └── utils.ts          # Helper functions
-├── services/             # API service functions
-├── types/                # TypeScript type definitions
-└── prisma/               # Database schema and migrations
-    └── schema.prisma     # Prisma schema
+├── app/ # Next.js App Router
+│ ├── (auth)/ # Authentication pages
+│ ├── (dashboard)/ # Protected dashboard pages
+│ ├── api/ # API routes
+│ └── globals.css # Global styles
+├── components/ # React components
+│ ├── ui/ # shadcn/ui components
+│ ├── auth/ # Authentication components
+│ ├── dashboard/ # Dashboard components
+│ └── shared/ # Shared components
+├── hooks/ # Custom React hooks
+├── lib/ # Utility libraries
+│ ├── middleware.ts # Next.js middleware
+│ ├── prisma.ts # Prisma client
+│ └── utils.ts # Helper functions
+├── services/ # API service functions
+├── types/ # TypeScript type definitions
+└── prisma/ # Database schema and migrations
+└── schema.prisma # Prisma schema
 ```
 
 ## 🔧 Configuration
