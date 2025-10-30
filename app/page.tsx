@@ -216,7 +216,7 @@ export default function LandingPage() {
                     <a href="/login">Sign In</a>
                   </Button>
                   <Button asChild>
-                    <a href="/signup">Get Started</a>
+                    <a href="/register">Get Started</a>
                   </Button>
                 </div>
               )}
@@ -286,7 +286,7 @@ export default function LandingPage() {
                   <a href="/login">Sign In</a>
                 </Button>
                 <Button asChild className="w-full">
-                  <a href="/signup">Get Started</a>
+                  <a href="/register">Get Started</a>
                 </Button>
               </div>
             </div>
@@ -339,7 +339,7 @@ export default function LandingPage() {
               ) : (
                 <>
                   <Button size="lg" asChild className="text-lg px-8 py-6">
-                    <a href="/signup">
+                    <a href="/register">
                       Start Free Trial <ArrowRight className="ml-2 w-5 h-5" />
                     </a>
                   </Button>
@@ -487,7 +487,7 @@ export default function LandingPage() {
                       variant={plan.popular ? 'default' : 'outline'}
                       asChild
                     >
-                      <a href={isAuthenticated ? '/billing' : '/signup'}>
+                      <a href={isAuthenticated ? '/billing' : '/register'}>
                         Get Started
                       </a>
                     </Button>
@@ -631,7 +631,7 @@ export default function LandingPage() {
                 asChild
                 className="text-lg px-8 py-6"
               >
-                <a href="/signup">
+                <a href="/register">
                   Start Your Free Trial <ArrowRight className="ml-2 w-5 h-5" />
                 </a>
               </Button>
