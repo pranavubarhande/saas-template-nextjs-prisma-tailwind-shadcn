@@ -1,17 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userService } from '@/services/user.service';
 
-// Get current user settings
-export function useUserSettings() {
+export const useUserSettings = () => {
   return useQuery({
     queryKey: ['user-settings'],
     queryFn: userService.getUserSettings,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
-}
+};
 
-// Update profile mutation
-export function useUpdateProfile() {
+export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -21,17 +19,15 @@ export function useUpdateProfile() {
       queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
   });
-}
+};
 
-// Update password mutation
-export function useUpdatePassword() {
+export const useUpdatePassword = () => {
   return useMutation({
     mutationFn: userService.updatePassword,
   });
-}
+};
 
-// Delete account mutation
-export function useDeleteAccount() {
+export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -43,4 +39,4 @@ export function useDeleteAccount() {
       window.location.href = '/login';
     },
   });
-}
+};

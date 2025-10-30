@@ -1,43 +1,44 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/services/auth.service';
 
-// Register mutation
-export function useRegister() {
+export const useRegister = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authService.register,
     onSuccess: (data) => {
       if (data.token) {
         localStorage.setItem('token', data.token);
+        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       }
     },
   });
-}
+};
 
-// Login mutation
-export function useLogin() {
+export const useLogin = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authService.login,
     onSuccess: (data) => {
       console.log(data);
       if (data.token) {
         localStorage.setItem('token', data.token);
+        queryClient.invalidateQueries({ queryKey: ['currentUser'] });
       }
     },
   });
-}
+};
 
 // Get current user query
-export function useCurrentUser() {
+export const useCurrentUser = () => {
   return useQuery({
     queryKey: ['currentUser'],
     queryFn: authService.getCurrentUser,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
-}
+};
 
-// Logout mutation
-export function useLogout() {
+export const useLogout = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -53,4 +54,4 @@ export function useLogout() {
       window.location.href = '/login';
     },
   });
-}
+};
